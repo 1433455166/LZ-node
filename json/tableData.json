@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "label": 1,
+      "build": ["baseCamp", "barracks", "trainingCamp", "cannon"],
+      "maxBuildLabel": {
+        "baseCamp": 1,
+        "barracks": 1,
+        "trainingCamp": 1,
+        "cannon": 1
+      },
+      "translate": {
+        "baseCamp": "大本营",
+        "barracks": "兵营",
+        "trainingCamp": "训练营",
+        "cannon": "加农炮"
+      }
+    },
+    {
+      "label": 2,
+      "build": ["baseCamp", "barracks", "trainingCamp", "cannon", "bartizan"],
+      "maxBuildLabel": {
+        "baseCamp": 2,
+        "barracks": 2,
+        "trainingCamp": 2,
+        "cannon": 2,
+        "bartizan": 1
+      },
+      "translate": {
+        "baseCamp": "大本营",
+        "barracks": "兵营",
+        "trainingCamp": "训练营",
+        "cannon": "加农炮",
+        "bartizan": "箭塔"
+      }
+    }
+  ]
+}
