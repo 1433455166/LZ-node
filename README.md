@@ -5,8 +5,11 @@ node 项目
 1. 发现本地的node接口跨域了，试了一下用 setupProxy 文件配置代理问题，结果把代码删掉过后本地项目都起不来。。
 后来删掉了 setupProxy 文件就可以跑了，setupProxy 文件配置还是有点问题，不过现在问题解决了
 2. post 接口要解析请求体
+- 20230903 多云 周日
+接入数据库
 # 项目
 ## 启动
-node api.js
+1. node api.js
+2. npm start
 # 注意
 每次有代码修改需要重启项目
