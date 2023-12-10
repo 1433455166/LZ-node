@@ -153,8 +153,8 @@ app.post("/coc.delete", (req, res) => {
   // });
   // const collection = mongoose.model(collectionName, tomSchema);
   const collection = db.collection(collectionName);
-  const dataID = data?.translate;
-  collection.deleteOne({ translate: dataID }, function (err, value) {
+  const dataID = data?.id;
+  collection.deleteOne({ id: dataID }, function (err, value) {
     if (err) throw err;
     // console.log(`集合中${dataID}的数据已删除！`);
     res.send({
@@ -174,6 +174,64 @@ app.post("/coc.delete", (req, res) => {
   // }).catch(err => {
   //   console.error('Error deleting document:', err);
   // });
+});
+
+// 部落冲突 编辑接口
+app.post("/coc.edit", (req, res) => {
+  // 处理 POST 请求
+  const data = req.body;
+  // 验证请求体是否存在
+  if (!data) {
+    console.error("Request body is empty.");
+    res.status(400).send("Request body is empty.");
+    return;
+  }
+  const collectionName = "build-test";
+  const collection = db.collection(collectionName);
+  collection.updateOne({ id: data.id }, { $set: {
+    build: data.build,
+    label:data.label,
+    translate: data.translate
+  } },  (err, value) => {
+    if (err) throw err;
+    res.send({
+      databaseUrl,
+      success: true,
+      collectionName,
+      value,
+    });
+  });
+});
+
+// 部落冲突 search查询接口
+app.post("/coc.search", (req, res) => {
+  // 处理 POST 请求
+  const data = req.body;
+  // 验证请求体是否存在
+  if (!data) {
+    console.error("Request body is empty.");
+    res.status(400).send("Request body is empty.");
+    return;
+  }
+  const collectionName = "build-test";
+  const collection = db.collection(collectionName);
+  // 定义多个查询条件  
+  const newArr = []
+  for(const i in data) {
+    newArr.push({ [i]: data[i] })
+  }
+  const query = { $and: newArr };  
+  collection.find(query).toArray()
+  .then((docs) => {  
+    res.send({
+      databaseUrl,
+      success: true,
+      collectionName,
+      docs,
+    });
+  }).catch((err) => {  
+    console.error('查询失败：', err);  
+  });  
 });
 
 app.post("/test", (req, res) => {
