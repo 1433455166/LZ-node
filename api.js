@@ -4,6 +4,8 @@ const fs = require("fs");
 var path = require("path");
 var cors = require("cors");
 
+const session = require('express-session');  
+
 const app = express();
 
 // const database = "122";
@@ -50,6 +52,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cors());
+
+// 设置 session 秘钥（必须）  
+const secretKey = 'your-secret-key'; // 请替换为你自己的秘钥  
+  
+// 使用 session 中间件  
+app.use(session({  
+  secret: secretKey, // 用于签署 session ID cookie 的秘钥  
+  resave: false, // 强制将 session 保存到 session store 中，即使 session 没有被修改  
+  saveUninitialized: true, // 强制将未初始化的 session 保存到 session store 中。一个新的、未初始化的 session 将被保存在 session store 中，当 session 是 "new" 时，但在中间件链中没有被修改。默认为 true，但将其设置为 false 可以帮助减少存储在 session store 中的数据量，特别是当使用 cookie-sessions 时。  
+  cookie: {  
+    maxAge: 1000 * 60 * 60 * 24, // 设置 session cookie 的过期时间（以毫秒为单位）  
+  },  
+  // 可以添加其他 session store 选项，如使用 Redis、MongoDB 等  
+})); 
 
 // // 路由接口
 app.use("/detail", detailRouter);
@@ -102,6 +118,16 @@ app.get("/coc.quary", async (req, res) => {
 
   // 将获取到的数据导出为JSON格式
   res.setHeader("Content-Type", "application/json");
+
+   // 设置一个名为 "mycookie" 的 cookie，其值为 "cookievalue"，过期时间为 1 小时（毫秒为单位）  
+   res.cookie('mycookie', 'cookievalue', {  
+    expires: new Date(Date.now() + 60 * 60 * 1000), // 1小时后过期  
+    httpOnly: true, // 限制 cookie 只能被服务器访问，客户端无法访问  
+    // secure: true, // 通过 HTTPS 传输 cookie（仅在 HTTPS 下设置）  
+  });  
+
+  // 设置 session 数据  
+  req.session.username = 'John Doe'; 
   res.send(JSON.stringify(result));
 });
 
@@ -191,7 +217,8 @@ app.post("/coc.edit", (req, res) => {
   collection.updateOne({ id: data.id }, { $set: {
     build: data.build,
     label:data.label,
-    translate: data.translate
+    translate: data.translate,
+    image: data.image,
   } },  (err, value) => {
     if (err) throw err;
     res.send({
