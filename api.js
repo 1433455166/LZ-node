@@ -5,8 +5,8 @@ const fs = require("fs");
 var path = require("path");
 var cors = require("cors");
 
-// 用户接口文件
 const user = require("./api/user");
+const coc = require("./api/coc");
 
 const session = require('express-session');
 
@@ -88,6 +88,7 @@ app.get("/", (req, res) => {
 app.get("/get", (req, res) => {
     res.send("get接口项目已成功启动");
 });
+
 app.get("/data", (req, res) => {
     fs.readFile("./json/data.json", function (err, data) {
         if (!err) {
@@ -114,164 +115,9 @@ app.get("/tableData", (req, res) => {
     });
 });
 
-// 部落冲突 列表查询接口
-app.get("/coc.quary", async (req, res) => {
-    const collectionName = "build-test";
-    // 获取数据库中的集合对象
-    const collection = db.collection(collectionName);
-
-    // 使用MongoDB的原生操作方法获取数据，例如find()
-    const cursor = collection.find({});
-
-    // 使用MongoDB的toArray()方法将查询结果转换为数组
-    const result = await cursor.toArray();
-
-    // 将获取到的数据导出为JSON格式
-    res.setHeader("Content-Type", "application/json");
-
-    // 设置一个名为 "mycookie" 的 cookie，其值为 "cookievalue"，过期时间为 1 小时（毫秒为单位）  
-    res.cookie('mycookie', 'cookievalue', {
-        expires: new Date(Date.now() + 60 * 60 * 1000), // 1小时后过期  
-        httpOnly: true, // 限制 cookie 只能被服务器访问，客户端无法访问  
-        // secure: true, // 通过 HTTPS 传输 cookie（仅在 HTTPS 下设置）  
-    });
-
-    // 设置 session 数据  
-    req.session.username = 'John Doe';
-    res.send(JSON.stringify(result));
-});
-
 // 解析请求体
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// 部落冲突 新增接口
-app.post("/coc.add", (req, res) => {
-    // 处理 POST 请求
-    const data = req.body;
-    // 验证请求体是否存在
-    if (!data) {
-        console.error("Request body is empty.");
-        res.status(400).send("Request body is empty.");
-        return;
-    }
-    const collectionName = "build-test";
-    const collection = db.collection(collectionName);
-    collection.insertOne(data, (err) => {
-        if (err) throw err;
-        console.log("文档已插入到集合中！");
-    });
-    res.send({
-        databaseUrl,
-        success: true,
-        collectionName,
-        data,
-    });
-});
-
-// 部落冲突 删除接口
-app.post("/coc.delete", (req, res) => {
-    // 处理 POST 请求
-    const data = req.body;
-    // const data = req.body && JSON.stringify(req.body);
-    // 验证请求体是否存在
-    if (!data) {
-        console.error("Request body is empty.");
-        res.status(400).send("Request body is empty.");
-        return;
-    }
-    const collectionName = "build-test";
-    // // 定义集合模型
-    // let tomSchema = mongoose.Schema({
-    //   build: String,
-    //   label: String,
-    //   translate: String,
-    // });
-    // const collection = mongoose.model(collectionName, tomSchema);
-    const collection = db.collection(collectionName);
-    const dataID = data?.id;
-    collection.deleteOne({ id: dataID }, function (err, value) {
-        if (err) throw err;
-        // console.log(`集合中${dataID}的数据已删除！`);
-        res.send({
-            databaseUrl,
-            success: true,
-            collectionName,
-            value,
-        });
-    });
-    // collection.deleteOne({ _id: dataID }).then(count => {
-    //   res.send({
-    //     databaseUrl,
-    //     success: true,
-    //     collectionName,
-    //     count,
-    //   });
-    // }).catch(err => {
-    //   console.error('Error deleting document:', err);
-    // });
-});
-
-// 部落冲突 编辑接口
-app.post("/coc.edit", (req, res) => {
-    // 处理 POST 请求
-    const data = req.body;
-    // 验证请求体是否存在
-    if (!data) {
-        console.error("Request body is empty.");
-        res.status(400).send("Request body is empty.");
-        return;
-    }
-    const collectionName = "build-test";
-    const collection = db.collection(collectionName);
-    collection.updateOne({ id: data.id }, {
-        $set: {
-            build: data.build,
-            label: data.label,
-            translate: data.translate,
-            image: data.image,
-        }
-    }, (err, value) => {
-        if (err) throw err;
-        res.send({
-            databaseUrl,
-            success: true,
-            collectionName,
-            value,
-        });
-    });
-});
-
-// 部落冲突 search查询接口
-app.post("/coc.search", (req, res) => {
-    // 处理 POST 请求
-    const data = req.body;
-    // 验证请求体是否存在
-    if (!data) {
-        console.error("Request body is empty.");
-        res.status(400).send("Request body is empty.");
-        return;
-    }
-    const collectionName = "build-test";
-    const collection = db.collection(collectionName);
-    // 定义多个查询条件  
-    const newArr = []
-    for (const i in data) {
-        newArr.push({ [i]: data[i] })
-    }
-    const query = { $and: newArr };
-    collection.find(query).toArray()
-        .then((docs) => {
-            res.send({
-                databaseUrl,
-                success: true,
-                collectionName,
-                docs,
-            });
-        }).catch((err) => {
-            console.error('查询失败：', err);
-        });
-});
 
 // 图片上传接口
 app.post("/picture.upload", upload.single('file'), (req, res) => {
@@ -301,6 +147,10 @@ app.post("/test", (req, res) => {
     res.send(data);
 });
 
+// 部落冲突测试 相关
+coc.coc(app, db)
+
+// 用户相关
 user.user(app, db)
 
 // 启动服务器
