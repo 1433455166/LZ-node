@@ -5,8 +5,10 @@ const fs = require("fs");
 var path = require("path");
 var cors = require("cors");
 
-const user = require("./api/user");
-const coc = require("./api/coc");
+const user = require("./routes/user");
+const coc = require("./routes/coc");
+
+const constants = require("./utils/constants");
 
 const session = require('express-session');
 
@@ -18,18 +20,21 @@ const upload = multer({ dest: '../uploads/' }); // 临时存储路径，你需�
 
 const app = express();
 
-// const database = "122";
-const database = "coc-database"; // 部落冲突数据库
-const databaseUrl = `mongodb://127.0.0.1:27017/${database}`;
+// 部落冲突数据库
+const database = "coc-database"; 
+// ip 地址
+const IPAddress = '127.0.0.1';
+
+const databaseUrl = `mongodb://${IPAddress}:27017/${database}`;
 
 // 老版本的 mongodb
-var mongoose = require("mongoose");
+const mongoose = require("mongoose");
 mongoose.connect(databaseUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
-var db = mongoose.connection;
+const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {
     console.log("数据库连接成功");
@@ -52,7 +57,7 @@ app.get("/export", async (req, res) => {
 });
 
 // 创建路由
-var detailRouter = require("./routes/index");
+var detailRouter = require("../routes/index");
 
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -64,7 +69,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 
 // 设置 session 秘钥（必须）  
-const secretKey = 'your-secret-key'; // 请替换为你自己的秘钥  
+const secretKey = 'LZ-secret-key'; // 请替换为你自己的秘钥  
 
 // 使用 session 中间件  
 app.use(session({
@@ -72,7 +77,7 @@ app.use(session({
     resave: false, // 强制将 session 保存到 session store 中，即使 session 没有被修改  
     saveUninitialized: true, // 强制将未初始化的 session 保存到 session store 中。一个新的、未初始化的 session 将被保存在 session store 中，当 session 是 "new" 时，但在中间件链中没有被修改。默认为 true，但将其设置为 false 可以帮助减少存储在 session store 中的数据量，特别是当使用 cookie-sessions 时。  
     cookie: {
-        maxAge: 1000 * 60 * 60 * 24, // 设置 session cookie 的过期时间（以毫秒为单位）  
+        maxAge: constants.SESSION_EXPIRATION, // 设置 session cookie 的过期时间（以毫秒为单位）  
     },
     // 可以添加其他 session store 选项，如使用 Redis、MongoDB 等  
 }));

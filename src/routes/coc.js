@@ -1,3 +1,5 @@
+const constants = require("../utils/constants");
+
 function coc(app, db) {
     const collectionName = "build-test";
     // 获取数据库中的集合对象
@@ -24,6 +26,7 @@ function coc(app, db) {
         } else {
             res.send({
                 success: false,
+                errorStatus: constants.ERROR_STATUS.SIGN_OUT,
                 errorMessage: '未登录，无法获取数据',
             });
         }
