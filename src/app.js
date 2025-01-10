@@ -8,7 +8,9 @@ var cors = require("cors");
 const user = require("./routes/user");
 const coc = require("./routes/coc");
 
-const constants = require("./utils/constants");
+const commonConst = require("./common/const");
+
+const { SESSION_EXPIRATION } = commonConst
 
 const session = require('express-session');
 
@@ -77,7 +79,7 @@ app.use(session({
     resave: false, // 强制将 session 保存到 session store 中，即使 session 没有被修改  
     saveUninitialized: true, // 强制将未初始化的 session 保存到 session store 中。一个新的、未初始化的 session 将被保存在 session store 中，当 session 是 "new" 时，但在中间件链中没有被修改。默认为 true，但将其设置为 false 可以帮助减少存储在 session store 中的数据量，特别是当使用 cookie-sessions 时。  
     cookie: {
-        maxAge: constants.SESSION_EXPIRATION, // 设置 session cookie 的过期时间（以毫秒为单位）  
+        maxAge: SESSION_EXPIRATION, // 设置 session cookie 的过期时间（以毫秒为单位）  
     },
     // 可以添加其他 session store 选项，如使用 Redis、MongoDB 等  
 }));
@@ -153,10 +155,10 @@ app.post("/test", (req, res) => {
 });
 
 // 部落冲突测试 相关
-coc.coc(app, db)
+coc.fn(app, db)
 
 // 用户相关
-user.user(app, db)
+user.fn(app, db)
 
 // 启动服务器
 const port = 888; // 可以根据需要更改端口号

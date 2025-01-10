@@ -4,5 +4,9 @@ module.exports = {
     // COOKIE_EXPIRATION: 1000 * 60 * 60 * 24, // 设置 cookie 的过期时间（以毫秒为单位）  
     ERROR_STATUS: {
         SIGN_OUT: "SIGN_OUT"
+    },
+    collection: {
+        coc: "build-test",
+        user: "user"
     }
 };

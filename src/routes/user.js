@@ -1,10 +1,11 @@
 // 方法
 const utils = require("../utils");
-const constants = require("../utils/constants");
+const commonConst = require("./common/const");
+
+const { ERROR_STATUS, collection } = commonConst
+const collectionName = collection.user
 
 function user(app, db) {
-
-    const collectionName = "user";
     const collection = db.collection(collectionName);
 
     // 用户注册接口
@@ -96,7 +97,7 @@ function user(app, db) {
             res.send({
                 success: false,
                 errorMessage: '用户登录过期，请重新登录！',
-                errorStatus: constants.ERROR_STATUS.SIGN_OUT,
+                errorStatus: ERROR_STATUS.SIGN_OUT,
             });
         } else if (!result.length) {
             res.send({
@@ -117,4 +118,4 @@ function user(app, db) {
 }
 
 //暴露
-exports.user = user;
+exports.fn = user;
