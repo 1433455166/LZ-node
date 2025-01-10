@@ -58,9 +58,6 @@ app.get("/export", async (req, res) => {
     res.send(JSON.stringify(result));
 });
 
-// 创建路由
-var detailRouter = require("../routes/index");
-
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
@@ -83,9 +80,6 @@ app.use(session({
     },
     // 可以添加其他 session store 选项，如使用 Redis、MongoDB 等  
 }));
-
-// // 路由接口
-app.use("/detail", detailRouter);
 
 // 设置路由和请求处理程序
 app.get("/", (req, res) => {

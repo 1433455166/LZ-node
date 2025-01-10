@@ -1,6 +1,6 @@
 // 方法
 const utils = require("../utils");
-const commonConst = require("./common/const");
+const commonConst = require("../common/const");
 
 const { ERROR_STATUS, collection } = commonConst
 const collectionName = collection.user
