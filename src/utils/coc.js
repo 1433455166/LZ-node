@@ -46,14 +46,13 @@ function coc(app, db) {
         }
         collection.insertOne(data, (err) => {
             if (err) throw err;
-            return;
+            console.log("文档已插入到集合中！");
         });
         res.send({
             success: true,
             collectionName,
             data,
         });
-        console.log("文档已插入到集合中！");
     });
 
     // 部落冲突 删除接口
