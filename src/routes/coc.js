@@ -19,19 +19,25 @@ function coc(app, db) {
         res.setHeader("Content-Type", "application/json");
 
         // 登录态才会获取数据
-        if (req.session.userID) {
-            res.send({
-                success: true,
-                collectionName,
-                data: JSON.stringify(result),
-            });
-        } else {
-            res.send({
-                success: false,
-                errorStatus: ERROR_STATUS.SIGN_OUT,
-                errorMessage: '未登录，无法获取数据',
-            });
-        }
+        // if (req.session.userID) {
+        //     res.send({
+        //         success: true,
+        //         collectionName,
+        //         data: JSON.stringify(result),
+        //     });
+        // } else {
+        //     res.send({
+        //         success: false,
+        //         errorStatus: ERROR_STATUS.SIGN_OUT,
+        //         errorMessage: '未登录，无法获取数据',
+        //     });
+        // }
+
+        res.send({
+            success: true,
+            collectionName,
+            data: JSON.stringify(result),
+        });
     });
 
     // 部落冲突 新增接口

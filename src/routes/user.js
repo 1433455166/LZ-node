@@ -2,7 +2,7 @@
 const utils = require("../utils");
 const commonConst = require("../common/const");
 
-const { ERROR_STATUS, collection } = commonConst
+const { ERROR_STATUS, collection, SESSION_EXPIRATION } = commonConst
 const collectionName = collection.user
 
 function user(app, db) {
@@ -68,11 +68,11 @@ function user(app, db) {
         } else {
             const [user] = result
             // 设置一个名为 "userID" 的 cookie，其值为 "cookievalue"，过期时间为 1 小时（毫秒为单位）  
-            // res.cookie('userID', user?.userID, {
-            //     expires: new Date(Date.now() + constants.SESSION_EXPIRATION), // 1小时后过期  
-            //     httpOnly: true, // 限制 cookie 只能被服务器访问，客户端无法访问  
-            //     // secure: true, // 通过 HTTPS 传输 cookie（仅在 HTTPS 下设置）  
-            // });
+            res.cookie('userID', user?.userID, {
+                expires: new Date(Date.now() + SESSION_EXPIRATION), // 1小时后过期  
+                httpOnly: true, // 限制 cookie 只能被服务器访问，客户端无法访问  
+                secure: true, // 通过 HTTPS 传输 cookie（仅在 HTTPS 下设置）  
+            });
 
             // 设置 session 数据  
             req.session.userID = user?.userID;
@@ -91,18 +91,26 @@ function user(app, db) {
 
     // 获取用户信息接口
     app.post("/user.get", async (req, res) => {
+        // 处理 POST 请求
+        const data = req.body;
         // 查询集合中的所有文档  
         const result = await collection.find({ userID: req.session.userID }).toArray()
-        if (!req.session.userID) {
+        if (!data && !req.session.userID) {
             res.send({
                 success: false,
                 errorMessage: '用户登录过期，请重新登录！',
                 errorStatus: ERROR_STATUS.SIGN_OUT,
             });
-        } else if (!result.length) {
+        } else if (!data && !result.length) {
             res.send({
                 success: false,
                 errorMessage: '用户名不存在，请注册！',
+                collectionName,
+                data,
+            });
+        } else if (data) {
+            res.send({
+                success: true,
                 collectionName,
                 data,
             });
