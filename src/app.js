@@ -2,7 +2,7 @@ const express = require("express");
 
 const bodyParser = require("body-parser");
 const fs = require("fs");
-var path = require("path");
+const path = require("path");
 // 文件格式转换
 const sharp = require('sharp');
 // var cors = require("cors");
@@ -12,7 +12,7 @@ const coc = require("./routes/coc");
 
 const commonConst = require("./common/const");
 
-const { SESSION_EXPIRATION, public, IPAddress } = commonConst
+const { SESSION_EXPIRATION, PUBLIC, IPAddress } = commonConst
 
 const session = require('express-session');
 
@@ -25,7 +25,7 @@ const upload = multer({ dest: 'uploads/' }); // 临时存储路径，你需要�
 const app = express();
 
 // 部落冲突数据库
-const database = "coc-database"; 
+const database = "coc-database";
 
 const databaseUrl = `mongodb://${IPAddress}:27017/${database}`;
 
@@ -128,7 +128,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // 确保上传目录存在
 const uploadDir = 'uploads';
 if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
+    fs.mkdirSync(uploadDir);
 }
 
 // 图片上传接口
@@ -136,7 +136,7 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
 
     // 假设您有一个名为'input.jpg'的图像文件，并且您想要将其转换为PNG格式并保存为'output.png'
     const inputFilePath = path.join(uploadDir, req.file.filename);
-    const outputFilePath = `${public}/images/${req.file.originalname}`;
+    const outputFilePath = `${PUBLIC}/images/${req.file.originalname}`;
     sharp(inputFilePath)
         .toFormat('png')
         .toFile(outputFilePath, (err) => {
@@ -144,7 +144,7 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
                 console.error('Error:', err);
             } else {
                 console.log('Image converted successfully.');
-                  // 转换成功后删除原文件
+                // 转换成功后删除原文件
                 fs.unlink(inputFilePath, (err) => {
                     if (err) {
                         console.error('Error deleting original file:', err);
@@ -166,9 +166,9 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
 
     // 假设我们只是简单地返回上传成功的信息和文件路径（此处为临时路径）  
     const filePath = `http://${IPAddress}:888/files/images/${req.file.originalname}`;
-    return res.json({ 
-        status: 'success', 
-        message: 'File uploaded successfully.', 
+    return res.json({
+        status: 'success',
+        message: 'File uploaded successfully.',
         filePath
     });
 });

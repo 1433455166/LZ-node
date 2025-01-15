@@ -13,7 +13,7 @@ module.exports = {
         user: "user",
     },
     // 静态文件根目录名
-    public: 'public',
+    PUBLIC: 'public',
     // ip 地址
     IPAddress: '127.0.0.1',
 };
