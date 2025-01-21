@@ -1,14 +1,14 @@
 const commonConst = require("../common/const");
 
-const { collection, ERROR_STATUS } = commonConst
+const { collection } = commonConst
 const collectionName = collection.coc
 
-function coc(app, db) {
+function ccLz(app, db) {
     // 获取数据库中的集合对象
     const collection = db.collection(collectionName);
 
-    // 部落冲突 列表查询接口
-    app.get("/coc.quary", async (req, res) => {
+    // 列表查询：cc.lz.easyQueryList
+    app.get("/cc.lz.easyQueryList", async (req, res) => {
         // 使用MongoDB的原生操作方法获取数据，例如find()
         const cursor = collection.find({});
 
@@ -18,20 +18,11 @@ function coc(app, db) {
         // 将获取到的数据导出为JSON格式
         res.setHeader("Content-Type", "application/json");
 
-        // 登录态才会获取数据
-        if (req.session.userID) {
-            res.send({
-                success: true,
-                collectionName,
-                data: JSON.stringify(result),
-            });
-        } else {
-            res.send({
-                success: false,
-                errorStatus: ERROR_STATUS.SIGN_OUT,
-                errorMessage: '未登录，无法获取数据',
-            });
-        }
+        res.send({
+            success: true,
+            collectionName,
+            data: JSON.stringify(result),
+        });
     });
 
     // 部落冲突 新增接口
@@ -133,4 +124,4 @@ function coc(app, db) {
 }
 
 // 暴露
-exports.fn = coc;
+exports.fn = ccLz;
