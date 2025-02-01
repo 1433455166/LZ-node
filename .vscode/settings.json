@@ -1,0 +1,11 @@
+{
+    "eslint.options": {
+        "overrideConfigFile": "/Users/chencheng/Desktop/github/LZ-node/eslint.config.mjs"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact"
+    ]
+}

@@ -1,12 +1,21 @@
-// 方法
+const mongoose = require("mongoose");
 const utils = require("../utils");
 const commonConst = require("../common/const");
 
-const { ERROR_STATUS, collection, SESSION_EXPIRATION } = commonConst
+const { ERROR_STATUS, collection, SESSION_EXPIRATION, IPAddress, database } = commonConst
 const collectionName = collection.user
 
-function user(app, db) {
-    const collection = db.collection(collectionName);
+// 数据库集合地址
+const databaseUrl = `mongodb://${IPAddress}:27017/${database.cocDatabase}`;
+
+function user(app) {
+    // 数据库连接
+    const userCollection = mongoose.createConnection(databaseUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+
+    const collection = userCollection.collection(collectionName);
 
     // 用户注册接口
     app.post("/user.register", async (req, res) => {

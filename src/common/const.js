@@ -7,6 +7,13 @@ module.exports = {
     ERROR_STATUS: {
         SIGN_OUT: "SIGN_OUT",
     },
+    // 数据库
+    database: {
+        // 部落冲突
+        cocDatabase: "coc-database",
+        // 攀登读书
+        pdDatabase: '111',
+    },
     // 数据库集合列表
     collection: {
         coc: "build-test",

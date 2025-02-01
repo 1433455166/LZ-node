@@ -9,6 +9,7 @@ const sharp = require('sharp');
 
 const user = require("./routes/user");
 const coc = require("./routes/coc");
+const ccLz = require("./utils/ccLz");
 
 const commonConst = require("./common/const");
 
@@ -24,19 +25,16 @@ const upload = multer({ dest: 'uploads/' }); // 临时存储路径，你需要�
 
 const app = express();
 
-// 部落冲突数据库
-const database = "coc-database";
-
-const databaseUrl = `mongodb://${IPAddress}:27017/${database}`;
+// const databaseUrl = `mongodb://${IPAddress}:27017/${database?.pdDatabase}`;
 
 // 老版本的 mongodb
-const mongoose = require("mongoose");
-mongoose.connect(databaseUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
+// const mongoose = require("mongoose");
+// mongoose.connect(databaseUrl, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// });
 
-const db = mongoose.connection;
+// const db = mongoose.connection;
 // db.on("error", console.error.bind(console, "connection error:"));
 // db.once("open", function () {
 //     console.log("数据库连接成功");
@@ -186,10 +184,13 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
 // });
 
 // 部落冲突测试 相关
-coc.fn(app, db)
+coc.fn(app)
 
 // 用户相关
-user.fn(app, db)
+user.fn(app)
+
+// 简单的列表接口组件
+ccLz.fn(app)
 
 // 默认的路由，用于处理未匹配到的请求
 app.get('*', (req, res) => {

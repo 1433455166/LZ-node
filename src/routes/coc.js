@@ -1,11 +1,21 @@
 const commonConst = require("../common/const");
 
-const { collection, ERROR_STATUS } = commonConst
+const { collection, IPAddress, database } = commonConst
 const collectionName = collection.coc
 
-function coc(app, db) {
+const databaseUrl = `mongodb://${IPAddress}:27017/${database.cocDatabase}`;
+
+// 老版本的 mongodb
+const mongoose = require("mongoose");
+
+function coc(app) {
+    const cocCollection = mongoose.createConnection(databaseUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+    
     // 获取数据库中的集合对象
-    const collection = db.collection(collectionName);
+    const collection = cocCollection.collection(collectionName);
 
     // 部落冲突 列表查询接口
     app.get("/coc.quary", async (req, res) => {
