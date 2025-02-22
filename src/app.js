@@ -169,7 +169,7 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
     // 例如，你可以将文件移动到永久存储位置，并更新文件路径到数据库  
 
     // 假设我们只是简单地返回上传成功的信息和文件路径（此处为临时路径）  
-    const filePath = `http://${IPAddress}:888/files/images/${req.file.originalname}`;
+    const filePath = `http://${IPAddress}:888/files/images/${`${req?.body?.uploadAddress}/` || ''}${req.file.originalname}`;
     return res.json({
         status: 'success',
         message: 'File uploaded successfully.',

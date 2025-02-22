@@ -24,12 +24,16 @@ function ccLz(app) {
         }
 
         const collection = ccLzCollection.collection(data?.collection);
-        
+
         // 使用MongoDB的原生操作方法获取数据，例如find()
         const cursor = collection?.find({});
 
         // 使用MongoDB的toArray()方法将查询结果转换为数组
         const result = await cursor.toArray();
+        const arr = result.map((item) => {
+            const { _id, ...others } = item;
+            return others
+        })
 
         // 将获取到的数据导出为JSON格式
         res.setHeader("Content-Type", "application/json");
