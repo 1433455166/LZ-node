@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-binary-expression */
 const express = require("express");
 
 const bodyParser = require("body-parser");
@@ -10,6 +11,7 @@ const sharp = require('sharp');
 const user = require("./routes/user");
 const coc = require("./routes/coc");
 const ccLz = require("./utils/ccLz");
+const fileFn = require("./utils/file");
 
 const commonConst = require("./common/const");
 
@@ -131,10 +133,14 @@ if (!fs.existsSync(uploadDir)) {
 
 // 图片上传接口
 app.post("/picture.upload", upload.single('file'), (req, res) => {
-
+    if (req?.body?.uploadAddress) {
+        fileFn?.obj?.ensureUploadDirExists(`${PUBLIC}/images/${`${req?.body?.uploadAddress}`}`)
+    }
     // 假设您有一个名为'input.jpg'的图像文件，并且您想要将其转换为PNG格式并保存为'output.png'
     const inputFilePath = path.join(uploadDir, req.file.filename);
-    const outputFilePath = `${PUBLIC}/images/${req.file.originalname}`;
+    const outputFilePath = `${PUBLIC}/images/${`${req?.body?.uploadAddress}/` || ''}${req.file.originalname}`;
+    // console.log(123, outputFilePath);
+    
     sharp(inputFilePath)
         .toFormat('png')
         .toFile(outputFilePath, (err) => {
