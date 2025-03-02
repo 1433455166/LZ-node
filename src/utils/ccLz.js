@@ -41,7 +41,7 @@ function ccLz(app) {
         res.send({
             success: true,
             collectionName: data?.collection,
-            data: JSON.stringify(result),
+            data: arr,
         });
     });
 
