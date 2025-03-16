@@ -23,4 +23,8 @@ module.exports = {
     PUBLIC: 'public',
     // ip 地址
     IPAddress: '127.0.0.1',
+    // 我的邮箱
+    MY_EMAIL: "1433455166@qq.com",
+    // 授权码
+    AUTHORIZATION_CODE: "wcvflrcvztpagafe",
 };

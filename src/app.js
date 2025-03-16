@@ -4,12 +4,14 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
+const cors = require('cors');
 // 文件格式转换
 const sharp = require('sharp');
 // var cors = require("cors");
 
 const user = require("./routes/user");
 const coc = require("./routes/coc");
+const loginVerification = require("./routes/loginVerification");
 const ccLz = require("./utils/ccLz");
 const fileFn = require("./utils/file");
 
@@ -69,6 +71,13 @@ const app = express();
 
 // 设置静态文件目录
 app.use('/files', express.static(path.join(__dirname, '../public')));
+// 允许所有来源的请求
+// app.use(cors());
+// 或者指定特定的来源
+const corsOptions = {
+    origin: ['http://localhost:8080', 'http://localhost:3001'], // 允许的源列表
+};
+app.use(cors(corsOptions));
 
 // 设置路由和请求处理程序
 app.get("/", (req, res) => {
@@ -191,10 +200,10 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
 
 // 部落冲突测试 相关
 coc.fn(app)
-
+// 登录验证
+loginVerification.fn(app)
 // 用户相关
 user.fn(app)
-
 // 简单的列表接口组件
 ccLz.fn(app)
 
