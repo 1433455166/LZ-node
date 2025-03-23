@@ -1,7 +1,14 @@
 const nodemailer = require('nodemailer');
-const { MY_EMAIL, AUTHORIZATION_CODE } = require('../common/const');
+const mongoose = require("mongoose");
+const { MY_EMAIL, AUTHORIZATION_CODE, IPAddress, database, collection: coll } = require('../common/const');
+
+const databaseUrl = `mongodb://${IPAddress}:27017/${database?.pdDatabase}`;
 // 登录验证
 function loginVerification(app) {
+    const ccLzCollection = mongoose.createConnection(databaseUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     // 用于存储验证码的内存对象
     const verificationCodes = {};
 
@@ -26,8 +33,8 @@ function loginVerification(app) {
         const { email } = req.body;
         const code = generateRandomCode();
 
-        // 存储验证码到内存中，并设置过期时间为600秒（10分钟）
-        verificationCodes[email] = { code, expiresAt: Date.now() + 600 * 1000 };
+        // 存储验证码到内存中，并设置过期时间为120秒（2分钟）
+        verificationCodes[email] = { code, expiresAt: Date.now() + 120 * 1000 };
 
         const mailOptions = {
             from: `狼族 ${MY_EMAIL}`,
@@ -37,7 +44,7 @@ function loginVerification(app) {
             text: `您的验证码是 ${code}，请妥善保管。`, // 纯文本版本
             html: `<h2>欢迎注册我们的服务</h2>
                    <p>您的验证码是 <strong>${code}</strong>，请妥善保管。</p>
-                   <p>此验证码将在10分钟后失效。</p>
+                   <p>此验证码将在2分钟后失效。</p>
                    <style>
                        h2 { color: #333; }
                        p { font-size: 16px; color: #666; }
@@ -59,7 +66,7 @@ function loginVerification(app) {
         });
     });
     // 验证验证码接口
-    app.post('/cc.lz.register.verifyCode', (req, res) => {
+    app.post('/cc.lz.register.verifyCode', async (req, res) => {
         const { email, code } = req.body;
 
         if (!verificationCodes[email]) {
@@ -75,9 +82,17 @@ function loginVerification(app) {
     
         if (storedCode === code) {
             delete verificationCodes[email]; // 验证成功后删除验证码
+            const collection = ccLzCollection.collection(coll?.pdUsers);
+            const user = await collection.findOne({ email });
+            if (!user) {
+                collection.insertOne({ email }, (err) => {
+                    if (err) throw err;
+                });
+            }
             res.status(200).send({
                 success: true,
                 text: '验证码正确',
+                data: user,
             });
         } else {
             res.status(400).send('验证码错误');

@@ -18,6 +18,7 @@ module.exports = {
     collection: {
         coc: "build-test",
         user: "user",
+        pdUsers: "pdUsers",
     },
     // 静态文件根目录名
     PUBLIC: 'public',

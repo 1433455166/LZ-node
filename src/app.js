@@ -10,6 +10,7 @@ const sharp = require('sharp');
 // var cors = require("cors");
 
 const user = require("./routes/user");
+const bTestUser = require("./routes/b-test-user");
 const coc = require("./routes/coc");
 const loginVerification = require("./routes/loginVerification");
 const ccLz = require("./utils/ccLz");
@@ -28,54 +29,13 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' }); // 临时存储路径，你需要根据实际情况设置  
 
 const app = express();
-
-// const databaseUrl = `mongodb://${IPAddress}:27017/${database?.pdDatabase}`;
-
-// 老版本的 mongodb
-// const mongoose = require("mongoose");
-// mongoose.connect(databaseUrl, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-// });
-
-// const db = mongoose.connection;
-// db.on("error", console.error.bind(console, "connection error:"));
-// db.once("open", function () {
-//     console.log("数据库连接成功");
-// });
-
-// 定义一个导出数据的接口
-// app.get("/export", async (req, res) => {
-//     // 获取数据库中的集合对象
-//     const collection = db.collection("detaildatas");
-
-//     // 使用MongoDB的原生操作方法获取数据，例如find()
-//     const cursor = collection.find({});
-
-//     // 使用MongoDB的toArray()方法将查询结果转换为数组
-//     const result = await cursor.toArray();
-
-//     // 将获取到的数据导出为JSON格式
-//     res.setHeader("Content-Type", "application/json");
-//     res.send(JSON.stringify(result));
-// });
-
-// app.set("views", path.join(__dirname, "views"));
-// app.set("view engine", "ejs");
-
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-
-// 设置public目录为静态文件根目录
-// app.use(express.static(path.join(__dirname, public)));
-
 // 设置静态文件目录
 app.use('/files', express.static(path.join(__dirname, '../public')));
 // 允许所有来源的请求
 // app.use(cors());
 // 或者指定特定的来源
 const corsOptions = {
-    origin: ['http://localhost:8080', 'http://localhost:3001'], // 允许的源列表
+    origin: ['http://localhost:8080', 'http://localhost:3001', "http://192.168.31.172:8080"], // 允许的源列表
 };
 app.use(cors(corsOptions));
 
@@ -103,33 +63,6 @@ app.use(session({
     },
     // 可以添加其他 session store 选项，如使用 Redis、MongoDB 等  
 }));
-
-// app.get("/data", (req, res) => {
-//     fs.readFile("./json/data.json", function (err, data) {
-//         if (!err) {
-//             res.writeHead(200, {
-//                 "Content-Type": "text/html;charset=UTF-8",
-//             });
-//             res.end(data);
-//         } else {
-//             throw err;
-//         }
-//     });
-// });
-
-// app.get("/tableData", (req, res) => {
-//     fs.readFile("./json/tableData.json", function (err, data) {
-//         if (!err) {
-//             res.writeHead(200, {
-//                 "Content-Type": "text/html;charset=UTF-8",
-//             });
-//             res.end(data);
-//         } else {
-//             throw err;
-//         }
-//     });
-// });
-
 // 解析请求体
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -139,41 +72,36 @@ const uploadDir = 'uploads';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
 }
-
 // 图片上传接口
 app.post("/picture.upload", upload.single('file'), (req, res) => {
+    // req.body 将包含文本域的数据，如果有的话 
     if (req?.body?.uploadAddress) {
         fileFn?.obj?.ensureUploadDirExists(`${PUBLIC}/images/${`${req?.body?.uploadAddress}`}`)
     }
+    // req.file 是 'file' 字段的文件信息 
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
     // 假设您有一个名为'input.jpg'的图像文件，并且您想要将其转换为PNG格式并保存为'output.png'
     const inputFilePath = path.join(uploadDir, req.file.filename);
-    const outputFilePath = `${PUBLIC}/images/${`${req?.body?.uploadAddress}/` || ''}${req.file.originalname}`;
-    // console.log(123, outputFilePath);
-    
+    const outputFilePath = `${PUBLIC}/images/${req?.body?.uploadAddress ? `${req?.body?.uploadAddress}/` : ''}${req.file.originalname}`;
     sharp(inputFilePath)
         .toFormat('png')
         .toFile(outputFilePath, (err) => {
             if (err) {
                 console.error('Error:', err);
             } else {
-                console.log('Image converted successfully.');
                 // 转换成功后删除原文件
                 fs.unlink(inputFilePath, (err) => {
                     if (err) {
-                        console.error('Error deleting original file:', err);
+                        console.error('删除原始文件时出错:', err);
                     } else {
-                        console.log('Original file deleted successfully.');
+                        console.log('原始文件删除成功！');
                     }
                 });
             }
-        });
-
-    // req.file 是 'file' 字段的文件信息  
-    // req.body 将包含文本域的数据，如果有的话  
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
-
+        }); 
+   
     // 你可以在这里对文件进行进一步的处理，比如重命名、保存到数据库等  
     // 例如，你可以将文件移动到永久存储位置，并更新文件路径到数据库  
 
@@ -185,24 +113,12 @@ app.post("/picture.upload", upload.single('file'), (req, res) => {
         filePath
     });
 });
-
-// app.post("/test", (req, res) => {
-//     // 处理 POST 请求
-//     const data = req.body;
-//     // 验证请求体是否存在
-//     if (!data) {
-//         console.error("Request body is empty.");
-//         res.status(400).send("Request body is empty.");
-//         return;
-//     }
-//     res.send(data);
-// });
-
 // 部落冲突测试 相关
 coc.fn(app)
 // 登录验证
 loginVerification.fn(app)
 // 用户相关
+bTestUser.fn(app)
 user.fn(app)
 // 简单的列表接口组件
 ccLz.fn(app)
