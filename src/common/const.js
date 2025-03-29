@@ -28,4 +28,8 @@ module.exports = {
     MY_EMAIL: "1433455166@qq.com",
     // 授权码
     AUTHORIZATION_CODE: "wcvflrcvztpagafe",
+    // Ipinfo token
+    IPINFO_TOKEN: "15570f84271cdf",
+    // 我国国家码
+    CN: "CN"
 };

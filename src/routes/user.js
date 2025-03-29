@@ -22,7 +22,7 @@ function user(app) {
         return;
     }
     const collection = userCollection.collection(data?.collection);
-    const { email, ...othersData } = data?.data || {}
+    const { email, _id, ...othersData } = data?.data || {};
     collection.updateOne({ email: email }, {
         $set: { ...othersData }
     }, (err) => {

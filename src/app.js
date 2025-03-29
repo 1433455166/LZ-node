@@ -13,6 +13,7 @@ const user = require("./routes/user");
 const bTestUser = require("./routes/b-test-user");
 const coc = require("./routes/coc");
 const loginVerification = require("./routes/loginVerification");
+const getIp = require("./routes/getIp");
 const ccLz = require("./utils/ccLz");
 const fileFn = require("./utils/file");
 
@@ -122,6 +123,8 @@ bTestUser.fn(app)
 user.fn(app)
 // 简单的列表接口组件
 ccLz.fn(app)
+// 获取IP
+getIp.fn(app)
 
 // 默认的路由，用于处理未匹配到的请求
 app.get('*', (req, res) => {
